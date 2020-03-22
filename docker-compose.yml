@@ -1,27 +1,31 @@
-version: '3.0'
+version: '3.3'
 services:
   web:
-    image: alexcheng/magento2
+    build: ./developer
+    container_name: web
     ports:
       - "80:80"
     links:
       - db
-    volumes: 
-      - magento-data:/var/www/html  
+    volumes:
+      - ./volumes/magento-data:/var/www/html
     env_file:
       - env
+    command: >
+      sh -c "su www-data -c 'composer config --global github-oauth.github.com  && cd /var/www/html && composer install' && tail -f /dev/null"
   db:
     image: mysql:5.6.23
+    container_name: mysql
     volumes:
       - db-data:/var/lib/mysql/data
     env_file:
       - env
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
     ports:
       - "8580:80"
     links:
       - db     
 volumes:
-  magento-data:
-  db-data: 
+  db-data:
